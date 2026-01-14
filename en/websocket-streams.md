@@ -61,16 +61,16 @@
 
 * Request(client to server)
 
-| field     | value                       | note         |
-| --------- | --------------------------- | ------------ |
-| request   | `sub`/`unsub`/`pong`/`auth` |              |
-| requestId | long                        | Optional     |
-| args      | object                      |              |
+| field     | value                       | note     |
+|-----------|-----------------------------|----------|
+| request   | `sub`/`unsub`/`pong`/`auth` |          |
+| requestId | long                        | Optional |
+| args      | object                      |          |
 
 - Response(server's response)
 
 | field     | value                       | note                                              |
-| --------- | --------------------------- | ------------------------------------------------- |
+|-----------|-----------------------------|---------------------------------------------------|
 | type      | `sub`/`unsub`/`ping`/`auth` |                                                   |
 | requestId | long                        |                                                   |
 | data      | object                      |                                                   |
@@ -81,7 +81,7 @@
 - Push(server push to the client)
 
 | field | value          | note                               |
-| ----- | -------------- | ---------------------------------- |
+|-------|----------------|------------------------------------|
 | type  | `{topic name}` | The topic name for the pushed data |
 | data  | object         | The data format varies by topic    |
 
@@ -107,7 +107,7 @@
   "requestId": 123456,
   "data": {
     "code": 9200,
-    "data": {...}
+    "data": {}
   }
 }
 ```
@@ -254,14 +254,14 @@ Ping messages are sent by the server, and when the client receives them, it need
 **Beta Env**
 
 | Chain Name | Chain ID |
-| ---------- | -------- |
+|------------|----------|
 | BSC        | 97       |
 | X Layer    | 195      |
 
 **Prod Env**
 
 | Chain Name | Chain ID |
-| ---------- | -------- |
+|------------|----------|
 | BSC        | 56       |
 | X Layer    | 196      |
 
@@ -304,7 +304,7 @@ Ping messages are sent by the server, and when the client receives them, it need
     "l":256.15202,  // Today's lowest price
     "h":258.48045,  // Today's highest price
     "c":258.04005,  // Today's closing price
-    "pc":256.45015, // Prior closing price
+    "pc":256.45015, // Previous closing price
     "T":1768176000  // Timestamp(second)
   }
 }
@@ -326,10 +326,10 @@ Ping messages are sent by the server, and when the client receives them, it need
        "S":"AAPLc",     // Stock symbol
        "p":258.04005,   // Last price
        "o":256.46838,   // Opening price
-       "l":256.15202,   // Lowewst price
-       "h":258.48045,   // Highest prcec
+       "l":256.15202,   // Lowest price
+       "h":258.48045,   // Highest price
        "c":258.04005,   // Closing price
-       "pc":256.45015,  // Prior closing price
+       "pc":256.45015,  // Previous closing price
        "T":1759881600   // Timestamp(second)
      },{
        "s":2,
@@ -342,7 +342,6 @@ Ping messages are sent by the server, and when the client receives them, it need
        "pc":375.6325,
        "T":1759881600
      }
-     ......
   ]
 }
 ```
@@ -358,13 +357,13 @@ Ping messages are sent by the server, and when the client receives them, it need
 {
   "type": "aggregate",
   "data": {
-    "timestamp":1759953620  // Timestamp(second)
+    "timestamp":1759953620,  // Timestamp(second)
     "items":[
       {
         "s":1,              // Stock ID       
         "S":"AAPLc",        // Stock Symbol
         "p":258.04005,      // Last price
-        "pc":258.04005      // Prior closing price
+        "pc":258.04005      // Previous closing price
       },
       {
         "s":2,
@@ -395,7 +394,7 @@ Ping messages are sent by the server, and when the client receives them, it need
 {
   "type": "candle.AAPLc_1h",
   "data": {
-    "t": 1725811200     // Candle start time(Unix timestamp: s)
+    "t": 1725811200,    // Candle start time(Unix timestamp: s)
     "o": 65633.66,      // Open price
     "c": 65633.66,      // Close price
     "h": 66123.45,      // High price
@@ -427,7 +426,7 @@ Access to this channel's data requires authentication before subscription.
 {
   "type": "order.97.AAPLc",
   "data": {
-    "hx": "0xabcxxx"    // tx_hash
+    "hx": "0xabcxxx",   // tx_hash
     "id": 12345678,     // Order id
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
@@ -442,8 +441,8 @@ Access to this channel's data requires authentication before subscription.
     "d": 7,             // Valid date
     "st": "DEFAULT",    // SessionType
     "T": "USDC",        // Token of payment
-    "m": 234.23         // Order amount
-    "t": 1725844149     // Update time(Unix timestamp: s)
+    "m": 234.23,        // Order amount
+    "t": 1725844149,    // Update time(Unix timestamp: s)
     "E": 1725844149000  // Event time(Unix timestamp: ms)
   }
 }
@@ -455,7 +454,7 @@ Access to this channel's data requires authentication before subscription.
 {
   "type": "order.97.AAPLc",
   "data": {
-    "hx": "0xabcxxx"    // tx_hash
+    "hx": "0xabcxxx",   // tx_hash
     "id": 12345678,     // Order id
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
@@ -468,7 +467,7 @@ Access to this channel's data requires authentication before subscription.
     "R": "Free",        // Risk type
     "F": 0.000111,      // fee
     "T": "USDC",        // Token of payment
-    "t": 1725844149     // Update time(Unix timestamp: s)
+    "t": 1725844149,    // Update time(Unix timestamp: s)
     "E": 1725844149000  // Event time(Unix timestamp: ms)
   }
 }
@@ -480,14 +479,14 @@ Access to this channel's data requires authentication before subscription.
 {
   "type": "order.97.AAPLc",
   "data": {
-    "hx": "0xabcdxxx"             // tx_hash
+    "hx": "0xabcdxxx",            // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
     "y": "LIMIT",                 // Order type: MARKET/LIMIT
     "x": "CANCELED",              // Order status
     "R": "FREE",                  // Risk type
     "r": 1,                       // Reason
-    "t": 1725844149               // Update time(Unix timestamp: s)
+    "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
 }
@@ -499,11 +498,11 @@ Access to this channel's data requires authentication before subscription.
 {
   "type": "order.97.AAPLc",
   "data": {
-    "hx": "0xabcde"               // tx_hash
+    "hx": "0xabcde",              // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
     "x": "PENDING_CANCEL",        // Order status
-    "t": 1725844149               // Update time(Unix timestamp: s)
+    "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
 }
