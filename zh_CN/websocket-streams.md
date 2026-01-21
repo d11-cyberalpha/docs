@@ -95,7 +95,7 @@
 {
   "request": "sub",
   "requestId": 123456,
-  "args": ["price.AAPLc", "price.COINc", "realtime.AAPLc", "summary"]
+  "args": ["price.AAPLt", "price.COINt", "realtime.AAPLt", "summary"]
 }
 ```
 
@@ -135,7 +135,7 @@
 {
   "request": "unsub",
   "requestId": 123456,
-  "args": ["price.AAPLc", "price.COINc", "realtime.AAPLc", "summary"]
+  "args": ["price.AAPLt", "price.COINt", "realtime.AAPLt", "summary"]
 }
 ```
 
@@ -149,7 +149,7 @@
     "requestId": 123456,
     "data": {
       "code": 9200,
-      "data": "price.AAPLc"
+      "data": "price.AAPLt"
     }
   }
 ```
@@ -284,11 +284,11 @@
 
 ```json5
 {
-  "type": "price.AAPLc",
+  "type": "price.AAPLt",
   "data": {
-    "s":1,          // Stock ID
-    "p":258.04005,  // Last price
-    "t":1759953620  // Timestamp(second)
+    "s":1,          // 股票编号
+    "p":258.04005,  // 最新价格
+    "t":1759953620  // 时间戳(秒)
   }
 }
 ```
@@ -303,16 +303,16 @@
 
 ```json5
 {
-  "type": "realtime.AAPLc",
+  "type": "realtime.AAPLt",
   "data": {
-    "s":1,          // Stock ID    
-    "p":258.04005,  // Last price
-    "o":256.46838,  // Today's opening price
-    "l":256.15202,  // Today's lowest price
-    "h":258.48045,  // Today's highest price
-    "c":258.04005,  // Today's closing price
-    "pc":256.45015, // Previous closing price
-    "T":1768176000  // Timestamp(second)
+    "s":1,          // 股票编号    
+    "p":258.04005,  // 最新价格
+    "o":256.46838,  // 今开价
+    "l":256.15202,  // 最低价
+    "h":258.48045,  // 最高价
+    "c":258.04005,  // 当日收盘价
+    "pc":256.45015, // 昨日收盘价
+    "T":1768176000  // 时间戳(秒)
   }
 }
 ```
@@ -329,24 +329,26 @@
   "type": "summary",
   "data": [
      {
-       "s":1,           // Stock ID       
-       "S":"AAPLc",     // Stock symbol
-       "p":258.04005,   // Last price
-       "o":256.46838,   // Opening price
-       "l":256.15202,   // Lowest price
-       "h":258.48045,   // Highest price
-       "c":258.04005,   // Closing price
-       "pc":256.45015,  // Previous closing price
-       "T":1759881600   // Timestamp(second)
+       "s":1,           // 股票编号       
+       "S":"AAPLt",     // 股票Symbol
+       "p":258.04005,   // 最新价格
+       "o":256.46838,   // 今开价
+       "l":256.15202,   // 最低价
+       "h":258.48045,   // 最高价
+       "c":258.04005,   // 当日收盘价
+       "pc":256.45015,  // 昨日收盘价
+       "wc":256.45015,  // 上周收盘价
+       "T":1759881600   // 时间戳(秒)
      },{
        "s":2,
-       "S":"COINc",
+       "S":"COINt",
        "p":387.2823,
        "o":377.03758,
        "l":375.95872,
        "h":390.3395,
        "c":387.2823,
        "pc":375.6325,
+       "wc":256.45015,
        "T":1759881600
      }
   ]
@@ -364,17 +366,17 @@
 {
   "type": "aggregate",
   "data": {
-    "timestamp":1759953620,  // Timestamp(second)
+    "timestamp":1759953620,  // 时间戳(秒)
     "items":[
       {
-        "s":1,              // Stock ID       
-        "S":"AAPLc",        // Stock Symbol
-        "p":258.04005,      // Last price
-        "pc":258.04005      // Previous closing price
+        "s":1,              // 股票编号       
+        "S":"AAPLt",        // 股票Symbol
+        "p":258.04005,      // 最新价格
+        "pc":258.04005      // 昨日收盘价
       },
       {
         "s":2,
-        "S":"COINc",
+        "S":"COINt",
         "p":387.2823,    
         "pc":258.04005,
       }
@@ -399,16 +401,16 @@
 
 ```json5
 {
-  "type": "candle.AAPLc_1h",
+  "type": "candle.AAPLt_1h",
   "data": {
-    "t": 1725811200,    // Candle start time(Unix timestamp: s)
-    "o": 65633.66,      // Open price
-    "c": 65633.66,      // Close price
-    "h": 66123.45,      // High price
-    "l": 65000.00,      // Low price
-    "v": 0.0,           // Volume
-    "T": 0.0,           // Turnover
-    "E": 1725844149000  // Event time(Unix timestamp: ms)
+    "t": 1725811200,    // K线周期起始时间(Unix时间戳: 秒)
+    "o": 65633.66,      // 开盘价
+    "c": 65633.66,      // 收盘价
+    "h": 66123.45,      // 最高价
+    "l": 65000.00,      // 最低价
+    "v": 0.0,           // 成交量
+    "T": 0.0,           // 成交额
+    "E": 1725844149000  // Event time(Unix时间戳: 毫秒)
   } 
 }
 ```
@@ -431,26 +433,26 @@
 
 ```json5
 {
-  "type": "order.97.AAPLc",
+  "type": "order.97.AAPLt",
   "data": {
-    "hx": "0xabcxxx",   // tx_hash
-    "id": 12345678,     // Order id
-    "si": 1,            // Stock id
-    "p": 65535.00,      // Order price
-    "s": 0.12,          // Order size
-    "S": "BUY",         // Order side: BUY/SELL
-    "y": "LIMIT",       // Trade type: MARKET/LIMIT
-    "x": "NEW",         // Order status
-    "R": "FREE",        // Risk type
-    "N": 0.000123,      // Network fee(Stable Token)
-    "V": 0.01,          // Network fee(Native Token)
-    "f": "GTD",         // Time in force
-    "d": 7,             // Valid date
-    "st": "DEFAULT",    // SessionType
-    "T": "USDC",        // Token of payment
-    "m": 234.23,        // Order amount
-    "t": 1725844149,    // Update time(Unix timestamp: s)
-    "E": 1725844149000  // Event time(Unix timestamp: ms)
+    "hx": "0xabcxxx",   // 交易哈希
+    "id": 12345678,     // 订单编号
+    "si": 1,            // 股票编号
+    "p": 65535.00,      // 委托价格
+    "s": 0.12,          // 委托数量
+    "S": "BUY",         // 买卖方向: BUY/SELL
+    "y": "LIMIT",       // 订单类型: MARKET/LIMIT
+    "x": "NEW",         // 订单状态
+    "R": "FREE",        // 风险类型
+    "N": 0.000123,      // 网络手续费(稳定币支付)
+    "V": 0.01,          // 网络手续费(原生代币支付)
+    "f": "GTD",         // 订单有效时间
+    "d": 7,             // 有效期
+    "st": "DEFAULT",    // 交易时段类型
+    "T": "USDC",        // 支付代币
+    "m": 234.23,        // 订单金额
+    "t": 1725844149,    // 更新时间(Unix时间戳: 秒)
+    "E": 1725844149000  // Event time(Unix时间戳: 毫秒)
   }
 }
 ```
@@ -459,23 +461,23 @@
 
 ```json5
 {
-  "type": "order.97.AAPLc",
+  "type": "order.97.AAPLt",
   "data": {
-    "hx": "0xabcxxx",   // tx_hash
-    "id": 12345678,     // Order id
-    "si": 1,            // Stock id
-    "p": 65535.00,      // Order price
-    "s": 0.12,          // Order size
-    "S": "BUY",         // Order side: BUY/SELL
-    "y": "LIMIT",       // Trade type: MARKET/LIMIT
-    "C": 0,             // Cumulative trade size
-    "c": 0,             // Cumulative trade amount
-    "x": "FILLED",      // Order status: FILLED/PARTIALLY_FILLED
-    "R": "Free",        // Risk type
-    "F": 0.000111,      // fee
-    "T": "USDC",        // Token of payment
-    "t": 1725844149,    // Update time(Unix timestamp: s)
-    "E": 1725844149000  // Event time(Unix timestamp: ms)
+    "hx": "0xabcxxx",   // 交易哈希
+    "id": 12345678,     // 订单编号
+    "si": 1,            // 股票编号
+    "p": 65535.00,      // 委托价格
+    "s": 0.12,          // 委托数量
+    "S": "BUY",         // 买卖方向: BUY/SELL
+    "y": "LIMIT",       // 订单类型: MARKET/LIMIT
+    "C": 0,             // 累计交易量
+    "c": 0,             // 累计交易额
+    "x": "FILLED",      // 订单状态: FILLED/PARTIALLY_FILLED
+    "R": "Free",        // 风险类型
+    "F": 0.000111,      // 手续费
+    "T": "USDC",        // 支付代币
+    "t": 1725844149,    // 更新时间(Unix时间戳: 秒)
+    "E": 1725844149000  // Event time(Unix时间戳: 毫秒)
   }
 }
 ```
@@ -484,17 +486,17 @@
 
 ```json5
 {
-  "type": "order.97.AAPLc",
+  "type": "order.97.AAPLt",
   "data": {
-    "hx": "0xabcdxxx",            // tx_hash
-    "id": 12345678,               // Order id
-    "si": 1,                      // Stock id
-    "y": "LIMIT",                 // Order type: MARKET/LIMIT
-    "x": "CANCELED",              // Order status
-    "R": "FREE",                  // Risk type
-    "r": 1,                       // Reason
-    "t": 1725844149,              // Update time(Unix timestamp: s)
-    "E": 1725844149000            // Event time(Unix timestamp: ms)
+    "hx": "0xabcdxxx",            // 交易哈希
+    "id": 12345678,               // 订单编号
+    "si": 1,                      // 股票编号
+    "y": "LIMIT",                 // 订单类型: MARKET/LIMIT
+    "x": "CANCELED",              // 订单状态
+    "R": "FREE",                  // 风险类型
+    "r": 1,                       // 原因
+    "t": 1725844149,              // 更新时间(Unix时间戳: 秒)
+    "E": 1725844149000            // Event time(Unix时间戳: 毫秒)
   }
 }
 ```
@@ -503,14 +505,14 @@
 
 ```json5
 {
-  "type": "order.97.AAPLc",
+  "type": "order.97.AAPLt",
   "data": {
-    "hx": "0xabcde",              // tx_hash
-    "id": 12345678,               // Order id
-    "si": 1,                      // Stock id
-    "x": "PENDING_CANCEL",        // Order status
-    "t": 1725844149,              // Update time(Unix timestamp: s)
-    "E": 1725844149000            // Event time(Unix timestamp: ms)
+    "hx": "0xabcde",              // 交易哈希
+    "id": 12345678,               // 订单编号
+    "si": 1,                      // 股票编号
+    "x": "PENDING_CANCEL",        // 订单状态
+    "t": 1725844149,              // 更新时间(Unix时间戳: 秒)
+    "E": 1725844149000            // Event time(Unix时间戳: 毫秒)
   }
 }
 ```
