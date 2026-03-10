@@ -73,7 +73,7 @@ Interacting with different facets requires their respective ABI interfaces.
 | validDate    | uint32  | Y        |       | Valid days when TIF is GTD, range: [1,30]; otherwise set to 0                        |
 | networkFee   | uint64  | Y        | 6     | Set to 0 when paying with native tokens. Cannot be used together with native tokens. |
 | amount       | uint64  | Y        | 6     | Set to 0 (Not used for size-based market orders)                         |
-| price        | uint48  | Y        | 6     | For MARKET orders: Limit price (Slippage Protection). Set to `Reference Price * (1 + slippage)` for BUY, or `* (1 - slippage)` for SELL                       |
+| price        | uint48  | Y        | 6     | For MARKET orders: Worst acceptable price (Slippage Protection). Set to `Current Price * (1 + slippage)` for BUY, or `Current Price * (1 - slippage)` for SELL                       |
 | size         | uint48  | Y        | 6     | Order size. Must be a whole number of shares                                                     |
 
 **Note:**
@@ -113,12 +113,12 @@ const marketOrder: ITrading.NewOrder = {
     side: Side.BUY,
     tif: Tif.DAY,
     sessionType: SessionType.DEFAULT,
-    paymentToken: "0x....", // USDT address
+    paymentToken: "0x....",        // USDT address
     validDate: 0,
     networkFee: 0n,
     amount: 0n,
     price: parseUnits("15.15", 6), // 15 * (1 + 0.01) Slippage protection (1%)
-    size: parseUnits("5", 6),    // Buy 5 shares
+    size: parseUnits("5", 6),      // Buy 5 shares
 };
 
 ITrading.placeOrder(marketOrder, {value: 33000000000000})
@@ -217,9 +217,9 @@ IMarket.getMarketConfig();
     "commissionRate": 3500,                 // 0.0035
     "maxCommissionRate": 10000,             // 0.01
     "minCommissionPerOrder": 350000,        // 0.35
-    "activityFeeRate": 166,                   // 0.000166
-    "minActivityFeePerOrder": 10000,          // 0.01
-    "maxActivityFeePerOrder": 8300000,        // 8.3
+    "activityFeeRate": 166,                 // 0.000166
+    "minActivityFeePerOrder": 10000,        // 0.01
+    "maxActivityFeePerOrder": 8300000,      // 8.3
     "networkFeeInNative": 2500000000000,    // 0.0000025 (assuming 18 decimals)
     "networkFeeInStable": 2000,             // 0.002000
     "minAmountPerOrder": 20000000,          // 20.000000
