@@ -26,7 +26,8 @@
 # Contract Interface
 
 ## Changelog
-
+- March 10, 2026 
+    - Support Market Order
 - January 14, 2026
     - Initial release
 
@@ -64,16 +65,16 @@ Interacting with different facets requires their respective ABI interfaces.
 | Parameter    | Type    | Required | Scale | Description                                                                          |
 |--------------|---------|----------|-------|--------------------------------------------------------------------------------------|
 | stockId      | uint32  | Y        |       | Stock ID                                                                             |
-| tradeType    | uint8   | Y        |       | Order Type: 0-LIMIT _1-MARKET_                                                       |
+| tradeType    | uint8   | Y        |       | Order Type: 0-LIMIT 1-MARKET                                                      |
 | side         | uint8   | Y        |       | Side: 0-BUY 1-SELL                                                                   |
 | tif          | uint8   | Y        |       | Time-in-Force: 0-DAY _1-GTD_ _2-GTC_                                                 |
 | sessionType  | uint8   | Y        |       | Trading Session: 0-DEFAULT                                                           |
 | paymentToken | address | Y        |       | Payment token (stablecoin) used for order collateral and settlement                  |
 | validDate    | uint32  | Y        |       | Valid days when TIF is GTD, range: [1,30]; otherwise set to 0                        |
 | networkFee   | uint64  | Y        | 6     | Set to 0 when paying with native tokens. Cannot be used together with native tokens. |
-| amount       | uint64  | Y        | 6     | Only applicable for MARKET BUY orders; otherwise set to 0                            |
-| price        | uint64  | Y        | 6     | For MARKET orders, use the BBO price                                                 |
-| size         | uint64  | Y        | 6     | Set to 0 for MARKET BUY orders                                                       |
+| amount       | uint64  | Y        | 6     | Set to 0 (Not used for size-based market orders)                         |
+| price        | uint48  | Y        | 6     | For MARKET orders: Worst acceptable price (Slippage Protection). Set to `Current Price * (1 + slippage)` for BUY, or `Current Price * (1 - slippage)` for SELL                       |
+| size         | uint48  | Y        | 6     | Order size. Must be a whole number of shares                                                     |
 
 **Note:**
 
@@ -83,22 +84,44 @@ Interacting with different facets requires their respective ABI interfaces.
 
 **Example:**
 
+**Limit Order**
+
 ```cgo
-const order: ITrading.NewOrder = {
+const limitOrder: ITrading.NewOrder = {
     stockId: 1,
     tradeType: TradeType.LIMIT,
     side: Side.SELL,
-    tif: Tif.GTD,
+    tif: Tif.DAY,
     sessionType: SessionType.DEFAULT,
     paymentToken: "0x....", // USDT address
-    validDate: 7n,
+    validDate: 0n,
     networkFee: 0n,
     amount: 0n,
     price: parseUnits("15", 6),
     size: parseUnits("5", 6),
 };
 
-ITrading.placeOrder(order, {value: 33000000000000})
+ITrading.placeOrder(limitOrder, {value: 33000000000000})
+```
+
+**Market Order**
+
+```cgo
+const marketOrder: ITrading.NewOrder = {
+    stockId: 1,
+    tradeType: TradeType.MARKET,
+    side: Side.BUY,
+    tif: Tif.DAY,
+    sessionType: SessionType.DEFAULT,
+    paymentToken: "0x....",        // USDT address
+    validDate: 0,
+    networkFee: 0n,
+    amount: 0n,
+    price: parseUnits("15.15", 6), // 15 * (1 + 0.01) Slippage protection (1%)
+    size: parseUnits("5", 6),      // Buy 5 shares
+};
+
+ITrading.placeOrder(marketOrder, {value: 33000000000000})
 ```
 
 ### 2.1.2 Cancel Order
@@ -113,7 +136,7 @@ ITrading.cancelOrder(1938972632992);
 
 ### 2.1.3 Get Order
 
-`ITrading.getOrder(Id orderId) returns(ITrading.OrderInfo)`
+`ITrading.getOrder(uint64 orderId) returns(ITrading.OrderInfo)`
 
 **Note:** 
 Can only query open orders.
@@ -126,11 +149,11 @@ Can only query open orders.
 | stockId           | 	uint32	  | 	      | Stock ID                                 |
 | amount            | 	uint64	  |        | 	Frozen/collateral amount                |
 | paymentToken	     | address   | 	      | 	Payment token                           |
-| size              | 	uint64	  |        | 	Set to 0 for MARKET BUY orders          |
-| price	            | uint64		  |        | Worst acceptable price for market orders |
+| size              | 	uint48	  |        | 	Order size          |
+| price	            | uint48		  |        | Worst acceptable price for market orders |
 | tradeType         | 	uint8    | 	      | 	Order Type: 0-LIMIT 1-MARKET            |
 | side	             | uint8	    |        | 	Side: 0-BUY 1-SELL                      |
-| state             | 	uint64	  | 	      | [Order state](#31-Order-State)           |
+| state             | 	uint8	  | 	      | [Order state](#31-Order-State)           |
 | filledAmount	     | uint64	   | 6	     | Filled/collateral-released amount        |
 | filledSize        | 	uint48   | 	6	    | Filled quantity                          |
 | chargedFees       | 	uint40	  | 6	     | Platform fees already charged            |
@@ -170,18 +193,19 @@ ITrading.getOrder(123456784567);
 
 | Parameter	             | Type	     | Required | 	Scale   | 	Description                                                                                                  | 
 |------------------------|-----------|----------|----------|---------------------------------------------------------------------------------------------------------------|
-| actions	               | uint32    | 	Y       | 	        | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
+| actions	               | uint64    | 	Y       | 	        | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
 | commissionRate         | uint32	   | Y	       | 6	       | Broker commission rate (fee calculated per share)                                                             |
 | maxCommissionRate      | 	uint32	  | Y	       | 6	       | Maximum broker commission rate per order (fee calculated on trade amount)                                     |
 | minCommissionPerOrder	 | uint32	   | Y        | 	6       | 	Minimum broker commission per order                                                                          |
-| actionFeeRate          | 	uint32   | 	Y	      | 6	       | Trading activity fee rate (charged only on SELL)                                                              |
-| minActionFeePerOrder   | 	uint32   | 	Y       | 	6       | 	Minimum trading activity fee per order (charged only on SELL)                                                |
-| maxActionFeePerOrder   | 	uint32	  | Y	       | 6        | 	Maximum trading activity fee per order (charged only on SELL)                                                |
+| activityFeeRate          | 	uint32   | 	Y	      | 6	       | Trading activity fee rate (charged only on SELL)                                                              |
+| minActivityFeePerOrder   | 	uint32   | 	Y       | 	6       | 	Minimum trading activity fee per order (charged only on SELL)                                                |
+| maxActivityFeePerOrder   | 	uint32	  | Y	       | 6        | 	Maximum trading activity fee per order (charged only on SELL)                                                |
 | networkFeeInNative     | 	uint128	 | Y	       | By chain | 	Minimum network fee when paying with native tokens                                                           |
-| networkFeeInStable	    | uint64    | 	Y       | 	6       | 	Minimum network fee when paying with stablecoins                                                             |
+| networkFeeInStable	    | uint32    | 	Y       | 	6       | 	Minimum network fee when paying with stablecoins                                                             |
 | minAmountPerOrder      | 	uint32   | 	Y	      | 6	       | Minimum order amount                                                                                          |
-| priceTTL               | 	uint16	  | Y	       |          | 	Oracle price validity period (seconds)                                                                       |
+| priceTTL               | 	uint32	  | Y	       |          | 	Oracle price validity period (seconds)                                                                       |
 | priceTolerate	         | uint32	   | Y	       | 6	       | Maximum allowable deviation percentage between settlement price and oracle price                              |
+| marketPriceTolerate    | 	uint32	  | Y	       | 6	       | Maximum allowable deviation percentage between settlement price and oracle price for market orders                                                      |
 
 **Example:**
 
@@ -193,14 +217,15 @@ IMarket.getMarketConfig();
     "commissionRate": 3500,                 // 0.0035
     "maxCommissionRate": 10000,             // 0.01
     "minCommissionPerOrder": 350000,        // 0.35
-    "actionFeeRate": 166,                   // 0.000166
-    "minActionFeePerOrder": 10000,          // 0.01
-    "maxActionFeePerOrder": 8300000,        // 8.3
+    "activityFeeRate": 166,                 // 0.000166
+    "minActivityFeePerOrder": 10000,        // 0.01
+    "maxActivityFeePerOrder": 8300000,      // 8.3
     "networkFeeInNative": 2500000000000,    // 0.0000025 (assuming 18 decimals)
     "networkFeeInStable": 2000,             // 0.002000
     "minAmountPerOrder": 20000000,          // 20.000000
     "priceTTL": 60,                         // 60 seconds
-    "priceTolerate": 10000                  // 0.01 (1%)
+    "priceTolerate": 10000,                 // 0.01 (1%)
+    "marketPriceTolerate": 50000            // 0.05 (5%)
 }
 ```
 
@@ -213,13 +238,12 @@ IMarket.getMarketConfig();
 | Parameter	 | Type	    | Required | 	Scale	 | Description                                                                                                   |
 |------------|----------|----------|---------|---------------------------------------------------------------------------------------------------------------| 
 | token	     | address	 | Y	       |         | 	Contract address of the RWA asset                                                                            |
-| actions    | 	uint32	 | Y	       |         | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
+| actions    | 	uint64	 | Y	       |         | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
 | feeRate    | 	uint32	 | Y        | 	6	     | Platform fee rate (fee calculated on trade amount)                                                            |
 
 **Example:**
 
-```
-cgo
+```cgo
 IMarket.getStockConfig(1);
 // Returns
 {

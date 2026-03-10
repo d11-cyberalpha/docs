@@ -123,13 +123,18 @@
               "type": "uint32"
             },
             {
-              "internalType": "uint16",
+              "internalType": "uint32",
               "name": "priceTTL",
-              "type": "uint16"
+              "type": "uint32"
             },
             {
               "internalType": "uint32",
               "name": "priceTolerate",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "marketPriceTolerate",
               "type": "uint32"
             }
           ],
@@ -294,13 +299,18 @@
               "type": "uint32"
             },
             {
-              "internalType": "uint16",
+              "internalType": "uint32",
               "name": "priceTTL",
-              "type": "uint16"
+              "type": "uint32"
             },
             {
               "internalType": "uint32",
               "name": "priceTolerate",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "marketPriceTolerate",
               "type": "uint32"
             }
           ],
