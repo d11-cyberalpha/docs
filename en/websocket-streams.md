@@ -300,11 +300,9 @@ Ping messages are sent by the server, and when the client receives them, it need
   "data": {
     "s":1,          // Stock ID    
     "p":258.04005,  // Last price
-    "o":256.46838,  // Today's opening price
+    "o":256.46838,  // 24-hour opening price
     "l":256.15202,  // Today's lowest price
     "h":258.48045,  // Today's highest price
-    "c":258.04005,  // Today's closing price
-    "pc":256.45015, // Previous closing price    
     "T":1768176000  // Timestamp(second)
   }
 }
@@ -325,12 +323,9 @@ Ping messages are sent by the server, and when the client receives them, it need
        "s":1,           // Stock ID       
        "S":"AAPLt",     // Stock symbol
        "p":258.04005,   // Last price
-       "o":256.46838,   // Opening price
+       "o":256.46838,   // 24-hour opening price
        "l":256.15202,   // Lowest price
        "h":258.48045,   // Highest price
-       "c":258.04005,   // Closing price
-       "pc":256.45015,  // Previous closing price
-       "wc":256.45015,  // Last week's closing price
        "T":1759881600   // Timestamp(second)
      },{
        "s":2,
@@ -339,9 +334,6 @@ Ping messages are sent by the server, and when the client receives them, it need
        "o":377.03758,
        "l":375.95872,
        "h":390.3395,
-       "c":387.2823,
-       "pc":375.6325,
-       "wc":256.45015,
        "T":1759881600
      }
   ]
@@ -365,13 +357,13 @@ Ping messages are sent by the server, and when the client receives them, it need
         "s":1,              // Stock ID       
         "S":"AAPLt",        // Stock Symbol
         "p":258.04005,      // Last price
-        "pc":258.04005      // Previous closing price
+        "o":258.04005       // 24-hour opening price
       },
       {
         "s":2,
         "S":"COINt",
         "p":387.2823,    
-        "pc":258.04005,
+        "o":258.04005,
       }
     ]
   } 
@@ -404,6 +396,38 @@ Ping messages are sent by the server, and when the client receives them, it need
     "v": 0.0,           // Volume
     "T": 0.0,           // Turnover
     "E": 1725844149000  // Event time(Unix timestamp: ms)
+  } 
+}
+```
+## 2.6 Market Status
+
+**Topic:** `marketState`
+
+**Push Frequency:** 1次/秒
+
+**Message:**
+
+```json5
+{
+  "type": "marketState",
+  "data": {
+    "m": "us",          // Market: "us"-US, "hk"-HK
+    "s": 0,             // SessionType:
+                        // 0-NOT_OPEN 
+                        // 1-US_PRE_MARKET
+                        // 2-TRADING
+                        // 3-US_AFTER_HOURS
+                        // 4-CLOSED 
+                        // 5-US_NIGHT_SESSION 
+    "d": 0,             // TradingDayType: 
+                        // 0-DAY_TYPE_FULL
+                        // 1-DAY_TYPE_HALF_MORNING
+                        // 2-DAY_TYPE_HALF_AFTERNOON
+    "L": 7,             // Limit Order Trading Session Permissions: 
+                        // e.g. Pre-market Session: 0111 - Night Session - After-hours - Pre-market - Regular Trading Hours
+    "M": 0,             // Market Order Trading Session Permissions:
+                        // e.g. Pre-market Session: 0000 - Night Session - After-hours Session - Pre-market Session - Regular Trading Session
+    "t": 1725844149000  // Millisecond Timestamp
   } 
 }
 ```
