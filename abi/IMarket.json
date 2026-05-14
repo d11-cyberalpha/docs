@@ -67,6 +67,30 @@
       "type": "event"
     },
     {
+      "inputs": [
+        {
+          "internalType": "enum OracleType",
+          "name": "oracleType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint32",
+          "name": "stockId",
+          "type": "uint32"
+        }
+      ],
+      "name": "getFeedId",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "feedId",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "getMarketConfig",
       "outputs": [
@@ -158,32 +182,13 @@
       "outputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "provider",
           "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "enum OracleType",
-          "name": "oracleType",
-          "type": "uint8"
         },
         {
-          "internalType": "uint32",
-          "name": "stockId",
-          "type": "uint32"
-        }
-      ],
-      "name": "getPriceId",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "priceId",
-          "type": "bytes32"
+          "internalType": "address",
+          "name": "lib",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -242,6 +247,29 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum OracleType",
+          "name": "oracleType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint32[]",
+          "name": "stockIds",
+          "type": "uint32[]"
+        },
+        {
+          "internalType": "uint32[]",
+          "name": "feedIds",
+          "type": "uint32[]"
+        }
+      ],
+      "name": "updateFeedId",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -333,7 +361,12 @@
         },
         {
           "internalType": "address",
-          "name": "newAddress",
+          "name": "newProvider",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "newLib",
           "type": "address"
         }
       ],
@@ -356,29 +389,6 @@
         }
       ],
       "name": "updatePaymentToken",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "enum OracleType",
-          "name": "oracleType",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint32[]",
-          "name": "stockIds",
-          "type": "uint32[]"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "priceIds",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "updatePriceId",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

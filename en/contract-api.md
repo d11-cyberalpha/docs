@@ -26,6 +26,10 @@
 # Contract Interface
 
 ## Changelog
+- May 14, 2026
+    - `sessionType` now supports `PRE_MARKET`, `AFTER_HOURS`, and `OVERNIGHT`; non-`DEFAULT` sessions are available for `LIMIT` orders only
+- April 3, 2026
+    - `sessionType` now supports `PRE_MARKET_AND_AFTER_HOURS` for LIMIT orders only
 - March 10, 2026 
     - Support Market Order
 - January 14, 2026
@@ -68,7 +72,7 @@ Interacting with different facets requires their respective ABI interfaces.
 | tradeType    | uint8   | Y        |       | Order Type: 0-LIMIT 1-MARKET                                                      |
 | side         | uint8   | Y        |       | Side: 0-BUY 1-SELL                                                                   |
 | tif          | uint8   | Y        |       | Time-in-Force: 0-DAY _1-GTD_ _2-GTC_                                                 |
-| sessionType  | uint8   | Y        |       | Trading Session: 0-DEFAULT                                                           |
+| sessionType  | uint8   | Y        |       | Trading Session: 0-DEFAULT, 1-PRE_MARKET, 2-AFTER_HOURS, 3-OVERNIGHT, 4-PRE_MARKET_AND_AFTER_HOURS                                                           |
 | paymentToken | address | Y        |       | Payment token (stablecoin) used for order collateral and settlement                  |
 | validDate    | uint32  | Y        |       | Valid days when TIF is GTD, range: [1,30]; otherwise set to 0                        |
 | networkFee   | uint64  | Y        | 6     | Set to 0 when paying with native tokens. Cannot be used together with native tokens. |
@@ -80,6 +84,7 @@ Interacting with different facets requires their respective ABI interfaces.
 
 - The network fee paid in native token needs to have `value` set in the transaction.
 - Network fee payment in stablecoins is not yet supported; `networkFee` should be set to `0`.
+- `sessionType` accepts `DEFAULT`, `PRE_MARKET`, `AFTER_HOURS`, `OVERNIGHT`, and `PRE_MARKET_AND_AFTER_HOURS`. Non-`DEFAULT` session types can only be used with `LIMIT` orders.
 - Italicized values are not currently supported.
 
 **Example:**
@@ -92,8 +97,8 @@ const limitOrder: ITrading.NewOrder = {
     tradeType: TradeType.LIMIT,
     side: Side.SELL,
     tif: Tif.DAY,
-    sessionType: SessionType.DEFAULT,
-    paymentToken: "0x....", // USDT address
+    sessionType: SessionType.DEFAULT, // Use PRE_MARKET, AFTER_HOURS, OVERNIGHT, or PRE_MARKET_AND_AFTER_HOURS for non-DEFAULT LIMIT orders
+    paymentToken: "0x....",           // USDT address
     validDate: 0n,
     networkFee: 0n,
     amount: 0n,
