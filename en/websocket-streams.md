@@ -30,6 +30,9 @@
 
 ## Changelog
 
+- May 14, 2026
+  - Modified: Realtime Summary Aggregated
+  - Added: Market Status
 - January 11, 2026
   - Initial release
 
