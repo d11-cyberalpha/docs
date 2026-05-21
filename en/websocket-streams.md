@@ -23,17 +23,17 @@
   - [2.5 Candle](#25-candle)
 - [3 Private stream information](#3-private-stream-information)
   - [3.1 Order information](#31-order-information)
-- [Appendix: Dictionary](#appendix-dictionary)
-  - [1. Order Status](#1-order-status)
-  - [2. Order Failure/Cancellation Reason](#2-order-failurecancellation-reason)
-  - [3. Trade Type](#3-trade-type)
-  - [4. Trade Side](#4-trade-side)
-  - [5. Time In Force](#5-time-in-force)
-  - [6. Trading Session](#6-trading-session)
-  - [7. Risk Type](#7-risk-type)
-  - [8. Market](#8-market)
-  - [9. Market Status](#9-market-status)
-  - [10. Trading Day Type](#10-trading-day-type)
+- [4 Dictionary](#4-dictionary)
+  - [4.1 Order Status](#41-order-status)
+  - [4.2 Order Failure/Cancellation Reason](#42-order-failurecancellation-reason)
+  - [4.3 Trade Type](#43-trade-type)
+  - [4.4 Trade Side](#44-trade-side)
+  - [4.5 Time In Force](#45-time-in-force)
+  - [4.6 Trading Session](#46-trading-session)
+  - [4.7 Risk Type](#47-risk-type)
+  - [4.8 Market](#48-market)
+  - [4.9 Market Status](#49-market-status)
+  - [4.10 Trading Day Type](#410-trading-day-type)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -42,7 +42,7 @@
 ## Changelog
 
 - May 21, 2026
-  - Added: Appendix: Dictionary
+  - Added: Dictionary
 - May 14, 2026
   - Modified: Realtime Summary Aggregated
   - Added: Market Status
@@ -427,9 +427,9 @@ Ping messages are sent by the server, and when the client receives them, it need
 {
   "type": "marketState",
   "data": {
-    "m": "us",          // Market (Refer to Appendix: Dictionary - Market)
-    "s": 0,             // Market Status (Refer to Appendix: Dictionary - Market Status)
-    "d": 0,             // Trading Day Type (Refer to Appendix: Dictionary - Trading Day Type)
+    "m": "us",          // Market (Refer to Dictionary - Market)
+    "s": 0,             // Market Status (Refer to Dictionary - Market Status)
+    "d": 0,             // Trading Day Type (Refer to Dictionary - Trading Day Type)
     "L": 7,             // Limit Order Trading Session Permissions: 
                         // e.g. Pre-market Session: 0111 - Night Session - After-hours - Pre-market - Regular Trading Hours
     "M": 0,             // Market Order Trading Session Permissions:
@@ -464,15 +464,15 @@ Access to this channel's data requires authentication before subscription.
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
     "s": 0.12,          // Order size
-    "S": "BUY",         // Trade Side (Refer to Appendix: Dictionary - Trade Side)
-    "y": "LIMIT",       // Trade Type (Refer to Appendix: Dictionary - Trade Type)
-    "x": "NEW",         // Order Status (Refer to Appendix: Dictionary - Order Status)
-    "R": "FREE",        // Risk Type (Refer to Appendix: Dictionary - Risk Type)
+    "S": "BUY",         // Trade Side (Refer to Dictionary - Trade Side)
+    "y": "LIMIT",       // Trade Type (Refer to Dictionary - Trade Type)
+    "x": "NEW",         // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",        // Risk Type (Refer to Dictionary - Risk Type)
     "N": 0.000123,      // Network fee(Stable Token)
     "V": 0.01,          // Network fee(Native Token)
-    "f": "GTD",         // Time In Force (Refer to Appendix: Dictionary - Time In Force)
+    "f": "GTD",         // Time In Force (Refer to Dictionary - Time In Force)
     "d": 7,             // Valid date
-    "st": "DEFAULT",    // Trading Session (Refer to Appendix: Dictionary - Trading Session)
+    "st": "DEFAULT",    // Trading Session (Refer to Dictionary - Trading Session)
     "T": "USDC",        // Token of payment
     "m": 234.23,        // Order amount
     "t": 1725844149,    // Update time(Unix timestamp: s)
@@ -492,12 +492,12 @@ Access to this channel's data requires authentication before subscription.
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
     "s": 0.12,          // Order size
-    "S": "BUY",         // Trade Side (Refer to Appendix: Dictionary - Trade Side)
-    "y": "LIMIT",       // Trade Type (Refer to Appendix: Dictionary - Trade Type)
+    "S": "BUY",         // Trade Side (Refer to Dictionary - Trade Side)
+    "y": "LIMIT",       // Trade Type (Refer to Dictionary - Trade Type)
     "C": 0,             // Cumulative trade size
     "c": 0,             // Cumulative trade amount
-    "x": "FILLED",      // Order Status (Refer to Appendix: Dictionary - Order Status)
-    "R": "FREE",        // Risk Type (Refer to Appendix: Dictionary - Risk Type)
+    "x": "FILLED",      // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",        // Risk Type (Refer to Dictionary - Risk Type)
     "F": 0.000111,      // fee
     "T": "USDC",        // Token of payment
     "t": 1725844149,    // Update time(Unix timestamp: s)
@@ -515,10 +515,10 @@ Access to this channel's data requires authentication before subscription.
     "hx": "0xabcdxxx",            // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
-    "y": "LIMIT",                 // Trade Type (Refer to Appendix: Dictionary - Trade Type)
-    "x": "CANCELED",              // Order Status (Refer to Appendix: Dictionary - Order Status)
-    "R": "FREE",                  // Risk Type (Refer to Appendix: Dictionary - Risk Type)
-    "r": 1,                       // Reason (Refer to Appendix: Dictionary - Order Failure/Cancellation Reason)
+    "y": "LIMIT",                 // Trade Type (Refer to Dictionary - Trade Type)
+    "x": "CANCELED",              // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",                  // Risk Type (Refer to Dictionary - Risk Type)
+    "r": 1,                       // Reason (Refer to Dictionary - Order Failure/Cancellation Reason)
     "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
@@ -534,15 +534,15 @@ Access to this channel's data requires authentication before subscription.
     "hx": "0xabcde",              // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
-    "x": "PENDING_CANCEL",        // Order Status (Refer to Appendix: Dictionary - Order Status)
+    "x": "PENDING_CANCEL",        // Order Status (Refer to Dictionary - Order Status)
     "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
 }
 ```
-# Appendix: Dictionary
+# 4 Dictionary
 
-## 1. Order Status
+## 4.1 Order Status
 
 | Code             | Value | Description                 |
 |------------------|-------|-----------------------------|
@@ -554,7 +554,7 @@ Access to this channel's data requires authentication before subscription.
 | PENDING_CANCEL   | 8     | Pending Cancel              |
 | PENDING_FILL     | 9     | Pending Fill                |
 
-## 2. Order Failure/Cancellation Reason
+## 4.2 Order Failure/Cancellation Reason
 
 | Value | Description                                   |
 |-------|-----------------------------------------------|
@@ -569,21 +569,21 @@ Access to this channel's data requires authentication before subscription.
 | 8     | Trading Period Mismatch                       |
 | 9     | Market Order Cancelled Due to Timeout         |
 
-## 3. Trade Type
+## 4.3 Trade Type
 
 | Code   | Value | Description   |
 |--------|-------|---------------|
 | LIMIT  | 0     | Limit Order   |
 | MARKET | 1     | Market Order  |
 
-## 4. Trade Side
+## 4.4 Trade Side
 
 | Code | Value | Description |
 |------|-------|-------------|
 | BUY  | 0     | Buy         |
 | SELL | 1     | Sell        |
 
-## 5. Time In Force
+## 4.5 Time In Force
 
 | Code | Value | Description          |
 |------|-------|----------------------|
@@ -591,7 +591,7 @@ Access to this channel's data requires authentication before subscription.
 | GTD  | 1     | Good Till Date       |
 | GTC  | 2     | Good Till Cancelled  |
 
-## 6. Trading Session
+## 4.6 Trading Session
 
 | Code                       | Value | Description               |
 |----------------------------|-------|---------------------------|
@@ -601,20 +601,20 @@ Access to this channel's data requires authentication before subscription.
 | OVERNIGHT                  | 3     | Night Session             |
 | PRE_MARKET_AND_AFTER_HOURS | 4     | Pre‑market & After‑hours  |
 
-## 7. Risk Type
+## 4.7 Risk Type
 
 | Code | Value | Description |
 |------|-------|-------------|
 | FREE | 0     | No Risk     |
 
-## 8. Market
+## 4.8 Market
 
 | Code | Description   |
 |------|---------------|
 | us   | United States |
 | hk   | Hong Kong     |
 
-## 9. Market Status
+## 4.9 Market Status
 
 | Code             | Value | Description            |
 |------------------|-------|------------------------|
@@ -625,7 +625,7 @@ Access to this channel's data requires authentication before subscription.
 | CLOSED           | 4     | Closed                 |
 | US_NIGHT_SESSION | 5     | Night Session          |
 
-## 10. Trading Day Type
+## 4.10 Trading Day Type
 
 | Code                    | Value | Description       |
 |-------------------------|-------|-------------------|
