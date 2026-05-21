@@ -23,6 +23,17 @@
   - [2.5 Candle](#25-candle)
 - [3 Private stream information](#3-private-stream-information)
   - [3.1 Order information](#31-order-information)
+- [4 Dictionary](#4-dictionary)
+  - [4.1 Order Status](#41-order-status)
+  - [4.2 Order Failure/Cancellation Reason](#42-order-failurecancellation-reason)
+  - [4.3 Trade Type](#43-trade-type)
+  - [4.4 Trade Side](#44-trade-side)
+  - [4.5 Time In Force](#45-time-in-force)
+  - [4.6 Trading Session](#46-trading-session)
+  - [4.7 Risk Type](#47-risk-type)
+  - [4.8 Market](#48-market)
+  - [4.9 Market Status](#49-market-status)
+  - [4.10 Trading Day Type](#410-trading-day-type)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -30,6 +41,8 @@
 
 ## Changelog
 
+- May 21, 2026
+  - Added: Dictionary
 - May 14, 2026
   - Modified: Realtime Summary Aggregated
   - Added: Market Status
@@ -414,18 +427,9 @@ Ping messages are sent by the server, and when the client receives them, it need
 {
   "type": "marketState",
   "data": {
-    "m": "us",          // Market: "us"-US, "hk"-HK
-    "s": 0,             // SessionType:
-                        // 0-NOT_OPEN 
-                        // 1-US_PRE_MARKET
-                        // 2-TRADING
-                        // 3-US_AFTER_HOURS
-                        // 4-CLOSED 
-                        // 5-US_NIGHT_SESSION 
-    "d": 0,             // TradingDayType: 
-                        // 0-DAY_TYPE_FULL
-                        // 1-DAY_TYPE_HALF_MORNING
-                        // 2-DAY_TYPE_HALF_AFTERNOON
+    "m": "us",          // Market (Refer to Dictionary - Market)
+    "s": 0,             // Market Status (Refer to Dictionary - Market Status)
+    "d": 0,             // Trading Day Type (Refer to Dictionary - Trading Day Type)
     "L": 7,             // Limit Order Trading Session Permissions: 
                         // e.g. Pre-market Session: 0111 - Night Session - After-hours - Pre-market - Regular Trading Hours
     "M": 0,             // Market Order Trading Session Permissions:
@@ -460,15 +464,15 @@ Access to this channel's data requires authentication before subscription.
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
     "s": 0.12,          // Order size
-    "S": "BUY",         // Order side: BUY/SELL
-    "y": "LIMIT",       // Trade type: MARKET/LIMIT
-    "x": "NEW",         // Order status
-    "R": "FREE",        // Risk type
+    "S": "BUY",         // Trade Side (Refer to Dictionary - Trade Side)
+    "y": "LIMIT",       // Trade Type (Refer to Dictionary - Trade Type)
+    "x": "NEW",         // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",        // Risk Type (Refer to Dictionary - Risk Type)
     "N": 0.000123,      // Network fee(Stable Token)
     "V": 0.01,          // Network fee(Native Token)
-    "f": "GTD",         // Time in force
+    "f": "GTD",         // Time In Force (Refer to Dictionary - Time In Force)
     "d": 7,             // Valid date
-    "st": "DEFAULT",    // SessionType
+    "st": "DEFAULT",    // Trading Session (Refer to Dictionary - Trading Session)
     "T": "USDC",        // Token of payment
     "m": 234.23,        // Order amount
     "t": 1725844149,    // Update time(Unix timestamp: s)
@@ -488,12 +492,12 @@ Access to this channel's data requires authentication before subscription.
     "si": 1,            // Stock id
     "p": 65535.00,      // Order price
     "s": 0.12,          // Order size
-    "S": "BUY",         // Order side: BUY/SELL
-    "y": "LIMIT",       // Trade type: MARKET/LIMIT
+    "S": "BUY",         // Trade Side (Refer to Dictionary - Trade Side)
+    "y": "LIMIT",       // Trade Type (Refer to Dictionary - Trade Type)
     "C": 0,             // Cumulative trade size
     "c": 0,             // Cumulative trade amount
-    "x": "FILLED",      // Order status: FILLED/PARTIALLY_FILLED
-    "R": "Free",        // Risk type
+    "x": "FILLED",      // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",        // Risk Type (Refer to Dictionary - Risk Type)
     "F": 0.000111,      // fee
     "T": "USDC",        // Token of payment
     "t": 1725844149,    // Update time(Unix timestamp: s)
@@ -511,10 +515,10 @@ Access to this channel's data requires authentication before subscription.
     "hx": "0xabcdxxx",            // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
-    "y": "LIMIT",                 // Order type: MARKET/LIMIT
-    "x": "CANCELED",              // Order status
-    "R": "FREE",                  // Risk type
-    "r": 1,                       // Reason
+    "y": "LIMIT",                 // Trade Type (Refer to Dictionary - Trade Type)
+    "x": "CANCELED",              // Order Status (Refer to Dictionary - Order Status)
+    "R": "FREE",                  // Risk Type (Refer to Dictionary - Risk Type)
+    "r": 1,                       // Reason (Refer to Dictionary - Order Failure/Cancellation Reason)
     "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
@@ -530,9 +534,101 @@ Access to this channel's data requires authentication before subscription.
     "hx": "0xabcde",              // tx_hash
     "id": 12345678,               // Order id
     "si": 1,                      // Stock id
-    "x": "PENDING_CANCEL",        // Order status
+    "x": "PENDING_CANCEL",        // Order Status (Refer to Dictionary - Order Status)
     "t": 1725844149,              // Update time(Unix timestamp: s)
     "E": 1725844149000            // Event time(Unix timestamp: ms)
   }
 }
 ```
+# 4 Dictionary
+
+## 4.1 Order Status
+
+| Code             | Value | Description                 |
+|------------------|-------|-----------------------------|
+| NEW              | 0     | To Be Submitted             |
+| PARTIALLY_FILLED | 1     | Partially Filled            |
+| FAILED           | 2     | Order Failed (No Execution) |
+| CANCELLED        | 3     | Cancelled (No Execution)    |
+| FILLED           | 5     | Filled                      |
+| PENDING_CANCEL   | 8     | Pending Cancel              |
+| PENDING_FILL     | 9     | Pending Fill                |
+
+## 4.2 Order Failure/Cancellation Reason
+
+| Value | Description                                   |
+|-------|-----------------------------------------------|
+| 0     | No Additional Reason or User‑Initiated Action |
+| 1     | Initiated by System                           |
+| 2     | Cancelled on Market Close                     | 
+| 3     | Invalid Order                                 |
+| 4     | Rejected                                      |
+| 5     | Excessive Price Deviation                     |
+| 6     | User ID Does Not Exist                        |
+| 7     | Unsupported Price Precision                   |
+| 8     | Trading Period Mismatch                       |
+| 9     | Market Order Cancelled Due to Timeout         |
+
+## 4.3 Trade Type
+
+| Code   | Value | Description   |
+|--------|-------|---------------|
+| LIMIT  | 0     | Limit Order   |
+| MARKET | 1     | Market Order  |
+
+## 4.4 Trade Side
+
+| Code | Value | Description |
+|------|-------|-------------|
+| BUY  | 0     | Buy         |
+| SELL | 1     | Sell        |
+
+## 4.5 Time In Force
+
+| Code | Value | Description          |
+|------|-------|----------------------|
+| DAY  | 0     | Day Order            |
+| GTD  | 1     | Good Till Date       |
+| GTC  | 2     | Good Till Cancelled  |
+
+## 4.6 Trading Session
+
+| Code                       | Value | Description               |
+|----------------------------|-------|---------------------------|
+| DEFAULT                    | 0     | During Trading Session    |
+| PRE_MARKET                 | 1     | Pre‑market                |
+| AFTER_HOURS                | 2     | After‑hours               |
+| OVERNIGHT                  | 3     | Night Session             |
+| PRE_MARKET_AND_AFTER_HOURS | 4     | Pre‑market & After‑hours  |
+
+## 4.7 Risk Type
+
+| Code | Value | Description |
+|------|-------|-------------|
+| FREE | 0     | No Risk     |
+
+## 4.8 Market
+
+| Code | Description   |
+|------|---------------|
+| us   | United States |
+| hk   | Hong Kong     |
+
+## 4.9 Market Status
+
+| Code             | Value | Description            |
+|------------------|-------|------------------------|
+| NOT_OPEN         | 0     | Market Not Open        |
+| US_PRE_MARKET    | 1     | Pre‑market             |
+| TRADING          | 2     | During Trading Session |
+| US_AFTER_HOURS   | 3     | After‑hours            |
+| CLOSED           | 4     | Closed                 |
+| US_NIGHT_SESSION | 5     | Night Session          |
+
+## 4.10 Trading Day Type
+
+| Code                    | Value | Description       |
+|-------------------------|-------|-------------------|
+| DAY_TYPE_FULL           | 0     | FullDay           |
+| DAY_TYPE_HALF_MORNING   | 1     | MorningHalfDay    |
+| DAY_TYPE_HALF_AFTERNOON | 2     | AfternoonHalfDay  |
