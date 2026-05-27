@@ -89,9 +89,15 @@
           "internalType": "uint64",
           "name": "price",
           "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "clientAddress",
+          "type": "address"
         }
       ],
-      "name": "OrderCreated",
+      "name": "OrderCreatedV2",
       "type": "event"
     },
     {
@@ -201,13 +207,18 @@
             },
             {
               "internalType": "uint40",
-              "name": "chargedFees",
+              "name": "chargedPlatformFee",
               "type": "uint40"
             },
             {
               "internalType": "uint40",
               "name": "chargedCommission",
               "type": "uint40"
+            },
+            {
+              "internalType": "uint32",
+              "name": "lockedPlatformFeeRate",
+              "type": "uint32"
             }
           ],
           "internalType": "struct ITrading.OrderInfo",
@@ -276,6 +287,11 @@
               "internalType": "uint48",
               "name": "size",
               "type": "uint48"
+            },
+            {
+              "internalType": "address",
+              "name": "clientAddress",
+              "type": "address"
             }
           ],
           "internalType": "struct ITrading.NewOrder",
