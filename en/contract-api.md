@@ -309,9 +309,9 @@ Returns the current fee configuration, including the global platform fee rate an
 | mode      | uint8  | Y        |       | Base fee calculation mode. Determines the meaning and precision of `value`; must not be `NONE`. See `IMarket.FeeMode` below |
 | minMode   | uint8  | Y        |       | Calculation mode for the minimum fee bound. `NONE` means no minimum limit and determines the meaning and precision of `minValue` |
 | maxMode   | uint8  | Y        |       | Calculation mode for the maximum fee bound. `NONE` means no maximum limit and determines the meaning and precision of `maxValue` |
-| value     | uint32 | Y        |       | Base fee value. Its unit and precision depend on `mode`: `FIXED_FEE` = fixed amount scaled by `1e6`; `AMOUNT_RATIO` = amount-based rate scaled by `1e8`; `PER_SHARE` = per-share rate scaled by `1e8` |
-| minValue  | uint32 | Y        |       | Minimum fee bound value. Its unit and precision depend on `minMode`, using the same scaling rules as `value` |
-| maxValue  | uint32 | Y        |       | Maximum fee bound value. Its unit and precision depend on `maxMode`, using the same scaling rules as `value` |
+| value     | uint32 | Y        |       | Base fee value. Its unit and scale are determined by `mode`: `FIXED_FEE` = fixed amount scaled by `1e6`; `AMOUNT_RATIO` = amount-based rate scaled by `1e8`; `PER_SHARE` = per-share rate scaled by `1e8` |
+| minValue  | uint32 | Y        |       | Minimum fee bound value. Its unit and scale are determined by `minMode` |
+| maxValue  | uint32 | Y        |       | Maximum fee bound value. Its unit and scale are determined by `maxMode` |
 
 **IMarket.FeeMode**
 
