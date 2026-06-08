@@ -27,6 +27,10 @@
 # Contract Interface
 
 ## Changelog
+- June 8, 2026
+    - Support market orders in all trading sessions
+    - Add `CURRENT_SESSION` to `sessionType`
+    - Add `quoteTokenPaid` and `nativeValuePaid` return values to `placeOrder` for smart contract callers
 - May 27, 2026
     - Support B-side contract access
     - Support configurable brokerage fee rules
@@ -67,7 +71,7 @@ Interacting with different facets requires their respective ABI interfaces.
 
 ### 2.1.1 Place Order
 
-`ITrading.placeOrder(NewOrder calldata order) external payable`
+`ITrading.placeOrder(NewOrder calldata order) external payable returns (uint256 quoteTokenPaid, uint256 nativeValuePaid)`
 
 * NewOrder
 
@@ -77,7 +81,7 @@ Interacting with different facets requires their respective ABI interfaces.
 | tradeType    | uint8   | Y        |       | Order Type: 0-LIMIT 1-MARKET                                                      |
 | side         | uint8   | Y        |       | Side: 0-BUY 1-SELL                                                                   |
 | tif          | uint8   | Y        |       | Time-in-Force: 0-DAY _1-GTD_ _2-GTC_                                                 |
-| sessionType  | uint8   | Y        |       | Trading Session: 0-DEFAULT, 1-PRE_MARKET, 2-AFTER_HOURS, 3-OVERNIGHT, 4-PRE_MARKET_AND_AFTER_HOURS                                                           |
+| sessionType  | uint8   | Y        |       | Trading Session: 0-DEFAULT, 1-PRE_MARKET, 2-AFTER_HOURS, 3-OVERNIGHT, 4-PRE_MARKET_AND_AFTER_HOURS, 5-CURRENT_SESSION                                      |
 | paymentToken | address | Y        |       | Payment token (stablecoin) used for order collateral and settlement                  |
 | validDate    | uint32  | Y        |       | Valid days when TIF is GTD, range: [1,30]; otherwise set to 0                        |
 | networkFee   | uint64  | Y        | 6     | Set to 0 when paying with native tokens. Cannot be used together with native tokens. |
@@ -86,16 +90,27 @@ Interacting with different facets requires their respective ABI interfaces.
 | size         | uint48  | Y        | 6     | Order size. Must be a whole number of shares                                                     |
 | clientAddress| address | Y        |       | Client identifier expressed as an address in EVM address format. |
 
+* Returns
+
+| Return Value     | Type    | Scale           | Description                                         |
+|------------------|---------|-----------------|-----------------------------------------------------|
+| quoteTokenPaid   | uint256 | Quote token decimals  | Actual quote token amount paid by the caller |
+| nativeValuePaid  | uint256 | Native token decimals | Actual native token amount paid by the caller |
+
 **Note:**
 
 - The network fee paid in native token needs to have `value` set in the transaction.
 - Network fee payment in stablecoins is not yet supported; `networkFee` should be set to `0`.
-- `sessionType` accepts `DEFAULT`, `PRE_MARKET`, `AFTER_HOURS`, `OVERNIGHT`, and `PRE_MARKET_AND_AFTER_HOURS`. Non-`DEFAULT` session types can only be used with `LIMIT` orders.
+- `CURRENT_SESSION` allows the order to be submitted without explicitly specifying a trading session; the system determines the effective session when processing the order.
+- Market orders can be submitted with any supported `sessionType`.
+- `quoteTokenPaid` and `nativeValuePaid` are intended for smart contract callers; EOAs do not receive Solidity return values from a submitted transaction.
 - When the caller is also the client, `clientAddress` can be set to `0x0000000000000000000000000000000000000000`. For orders submitted by a B-side integrator contract, `account` is the caller contract address and `clientAddress` identifies the actual client. If the client does not use a self-custody wallet address, the B-side integrator must map the client's internal UID to an address in EVM address format and pass that mapped address as `clientAddress`.
 - `clientAddress` is case-insensitive, and EIP-55 checksum validation is not required.
 - Italicized values are not currently supported.
 
 **Example:**
+
+When the caller is also the client, set `clientAddress` to the zero address.
 
 **Example: Caller Is Also the Client - Limit Order**
 
@@ -105,7 +120,7 @@ const limitOrder: ITrading.NewOrder = {
     tradeType: TradeType.LIMIT,
     side: Side.SELL,
     tif: Tif.DAY,
-    sessionType: SessionType.DEFAULT, // Use PRE_MARKET, AFTER_HOURS, OVERNIGHT, or PRE_MARKET_AND_AFTER_HOURS for non-DEFAULT LIMIT orders
+    sessionType: SessionType.DEFAULT,
     paymentToken: "0x....",           // USDT address
     validDate: 0n,
     networkFee: 0n,
@@ -149,8 +164,8 @@ const bSideLimitOrder: ITrading.NewOrder = {
     tradeType: TradeType.LIMIT,
     side: Side.BUY,
     tif: Tif.DAY,
-    sessionType: SessionType.DEFAULT,
-    paymentToken: "0x....",           // USDT address
+    sessionType: SessionType.CURRENT_SESSION,
+    paymentToken: "0x....",                                      // USDT address
     validDate: 0n,
     networkFee: 0n,
     amount: 0n,

@@ -300,7 +300,18 @@
         }
       ],
       "name": "placeOrder",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "quoteTokenPaid",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "nativeValuePaid",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "payable",
       "type": "function"
     }
