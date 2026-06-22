@@ -207,18 +207,13 @@
             },
             {
               "internalType": "uint40",
-              "name": "chargedPlatformFee",
+              "name": "chargedFee",
               "type": "uint40"
             },
             {
               "internalType": "uint40",
               "name": "chargedCommission",
               "type": "uint40"
-            },
-            {
-              "internalType": "uint32",
-              "name": "lockedPlatformFeeRate",
-              "type": "uint32"
             }
           ],
           "internalType": "struct ITrading.OrderInfo",

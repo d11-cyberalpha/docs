@@ -27,21 +27,23 @@
 # Contract Interface
 
 ## Changelog
+- June 18, 2026
+  - Replace configurable brokerage fee-rule arrays with simplified commission configs for buy and sell orders
 - June 8, 2026
-    - Support market orders in all trading sessions
-    - Add `CURRENT_SESSION` to `sessionType`
-    - Add `quoteTokenPaid` and `nativeValuePaid` return values to `placeOrder` for smart contract callers
+  - Support market orders in all trading sessions
+  - Add `CURRENT_SESSION` to `sessionType`
+  - Add `quoteTokenPaid` and `nativeValuePaid` return values to `placeOrder` for smart contract callers
 - May 27, 2026
-    - Support B-side contract access
-    - Support configurable brokerage fee rules
+  - Support B-side contract access
+  - Support configurable brokerage fee rules
 - May 14, 2026
-    - `sessionType` now supports `PRE_MARKET`, `AFTER_HOURS`, and `OVERNIGHT`; non-`DEFAULT` sessions are available for `LIMIT` orders only
+  - `sessionType` now supports `PRE_MARKET`, `AFTER_HOURS`, and `OVERNIGHT`; non-`DEFAULT` sessions are available for `LIMIT` orders only
 - April 3, 2026
-    - `sessionType` now supports `PRE_MARKET_AND_AFTER_HOURS` for LIMIT orders only
+  - `sessionType` now supports `PRE_MARKET_AND_AFTER_HOURS` for LIMIT orders only
 - March 10, 2026 
-    - Support Market Order
+  - Support Market Order
 - January 14, 2026
-    - Initial release
+  - Initial release
 
 # 1. General Information
 
@@ -57,11 +59,9 @@ Interacting with different facets requires their respective ABI interfaces.
 
 ## 1.2 Scale
 
-- Unless otherwise specified, numeric values such as amounts, prices, and sizes use `6` decimal places.
+- Unless otherwise specified, numeric values such as amounts, prices, sizes, and fee rates use `6` decimal places.
 - **Stable Tokens**: Values must be normalized to `6` decimal places before submission. For example, if USDT uses `18` decimals, `0.01` USDT must be submitted as `10000`, not `10000000000000000`.
 - **Native Tokens**: Values follow the chain's native decimals.
-- **Fee-related fields**: Certain fee values use field-specific scales, either explicitly defined by the field or determined by `FeeMode`. For example, platform fee rates and amount-based fee rates use `1e8`, whereas fixed fees use `1e6`.
-- If a field defines its own `Scale` or explicitly specifies a different scale, follow that field-specific rule instead of the default one.
 
 # 2 ABIs
 
@@ -85,8 +85,8 @@ Interacting with different facets requires their respective ABI interfaces.
 | paymentToken | address | Y        |       | Payment token (stablecoin) used for order collateral and settlement                  |
 | validDate    | uint32  | Y        |       | Valid days when TIF is GTD, range: [1,30]; otherwise set to 0                        |
 | networkFee   | uint64  | Y        | 6     | Set to 0 when paying with native tokens. Cannot be used together with native tokens. |
-| amount       | uint64  | Y        | 6     | Set to 0 (Not used for size-based market orders)                         |
-| price        | uint48  | Y        | 6     | For MARKET orders: Worst acceptable price (Slippage Protection). Set to `Current Price * (1 + slippage)` for BUY, or `Current Price * (1 - slippage)` for SELL                       |
+| amount       | uint64  | Y        | 6     | Set to `0` for size-based market orders                         |
+| price        | uint48  | Y        | 6     | For MARKET orders: worst acceptable price (slippage protection). Set to `Current Price * (1 + slippage)` for BUY, or `Current Price * (1 - slippage)` for SELL                        |
 | size         | uint48  | Y        | 6     | Order size. Must be a whole number of shares                                                     |
 | clientAddress| address | Y        |       | Client identifier expressed as an address in EVM address format. |
 
@@ -99,14 +99,14 @@ Interacting with different facets requires their respective ABI interfaces.
 
 **Note:**
 
-- The network fee paid in native token needs to have `value` set in the transaction.
+- If the network fee is paid in native token, set the transaction `value` accordingly.
 - Network fee payment in stablecoins is not yet supported; `networkFee` should be set to `0`.
 - `CURRENT_SESSION` allows the order to be submitted without explicitly specifying a trading session; the system determines the effective session when processing the order.
 - Market orders can be submitted with any supported `sessionType`.
-- `quoteTokenPaid` and `nativeValuePaid` are intended for smart contract callers; EOAs do not receive Solidity return values from a submitted transaction.
+- `quoteTokenPaid` and `nativeValuePaid` are intended for smart contract callers; EOAs do not receive Solidity return values from submitted transactions.
 - When the caller is also the client, `clientAddress` can be set to `0x0000000000000000000000000000000000000000`. For orders submitted by a B-side integrator contract, `account` is the caller contract address and `clientAddress` identifies the actual client. If the client does not use a self-custody wallet address, the B-side integrator must map the client's internal UID to an address in EVM address format and pass that mapped address as `clientAddress`.
 - `clientAddress` is case-insensitive, and EIP-55 checksum validation is not required.
-- Italicized values are not currently supported.
+- Italicized values are not yet supported.
 
 **Example:**
 
@@ -192,7 +192,7 @@ ITrading.cancelOrder(1938972632992);
 `ITrading.getOrder(uint64 orderId) returns(ITrading.OrderInfo)`
 
 **Note:** 
-Can only query open orders.
+Only open orders can be queried.
 
 * ITrading.OrderInfo
 
@@ -209,9 +209,8 @@ Can only query open orders.
 | state             | 	uint8	  | 	      | [Order state](#31-Order-State)           |
 | filledAmount	     | uint64	   | 6	     | Filled/collateral-released amount        |
 | filledSize        | 	uint48   | 	6	    | Filled quantity                          |
-| chargedPlatformFee       | 	uint40	  | 6	     | Platform fees already charged            |
-| chargedCommission | 	uint40	  | 6      | 	Broker commission already charged       |
-| lockedPlatformFeeRate | uint32 | 8      |  Platform fee rate locked at order placement  |
+| chargedFee       | 	uint40	  | 6	     | Platform fees already charged            |
+| chargedCommission | 	uint40	  | 6      | Commission already charged       |
 
 **Example:**
 
@@ -223,16 +222,15 @@ ITrading.getOrder(123456784567);
     "stockId": 1,
     "amount": 10000000,              // 10.000000
     "paymentToken": "0x1234...",
-    "size": 1000000,                 // 1.000000
+    "size": 2000000,                 // 2.000000
     "price": 10000000,               // 10.000000
     "tradeType": 0,
     "side": 0,
-    "state": 0,
+    "state": 1,
     "filledAmount": 900000,          // 0.900000
     "filledSize": 1000000,           // 1.000000
-    "chargedPlatformFee": 6780,      // 0.006780
+    "chargedFee": 6780,              // 0.006780
     "chargedCommission": 360000,     // 0.36
-    "lockedPlatformFeeRate": 200000, // 0.002
 }
 ```
 
@@ -248,7 +246,7 @@ ITrading.getOrder(123456784567);
 
 | Parameter	             | Type	     | Required | 	Scale   | 	Description                                                                                                  | 
 |------------------------|-----------|----------|----------|---------------------------------------------------------------------------------------------------------------|
-| actions	               | uint64    | 	Y       | 	        | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
+| actions	               | uint64    | 	Y       | 	        | 	Allowed actions, represented as bits from right to left (bit set = allowed). See [Actions](#32-actions) |
 | networkFeeInNative     | 	uint128	 | Y	       | By chain | 	Minimum network fee when paying with native tokens                                                           |
 | networkFeeInStable	    | uint32    | 	Y       | 	6       | 	Minimum network fee when paying with stablecoins                                                             |
 | minAmountPerOrder      | 	uint32   | 	Y	      | 6	       | Minimum order amount                                                                                          |
@@ -287,8 +285,8 @@ IMarket.getMarketConfig();
 | Parameter	 | Type	    | Required | 	Scale	 | Description                                                                                                   |
 |------------|----------|----------|---------|---------------------------------------------------------------------------------------------------------------| 
 | token	     | address	 | Y	       |         | 	Contract address of the RWA asset                                                                            |
-| actions    | 	uint64	 | Y	       |         | 	Allowed actions, represented as bits from right to left (bit set = allowed). refer to [Actions](#32-actions) |
-| feeRate    | 	uint32	 | Y        | 	8	     | Per-stock platform fee rate override. A value of 0 means no override, and the global platform fee rate applies.                                                            |
+| actions    | 	uint64	 | Y	       |         | 	Allowed actions, represented as bits from right to left (bit set = allowed). See [Actions](#32-actions) |
+| feeRate    | 	uint32	 | Y        | 	6	     | Per-stock platform fee rate override. A value of 0 means no override, and the global platform fee rate applies.                                                            |
 
 **Example:**
 
@@ -298,44 +296,32 @@ IMarket.getStockConfig(1);
 {
     "token": "0x...",
     "actions": 3,
-    "feeRate": 400000      // 0.004
+    "feeRate": 400      // 0.0004
 }
 ```
 
 ### 2.2.3 Get Fee Config
 
-`IMarket.getFeeConfig() external view returns (uint32 platformFeeRate, IMarket.FeeRule[] buyFeeRules, IMarket.FeeRule[] sellFeeRules)`
+`IMarket.getFeeConfig() external view returns (uint32 globalFeeRate, IMarket.CommissionConfig buyCommissionConfig, IMarket.CommissionConfig sellCommissionConfig)`
 
-Returns the current fee configuration, including the global platform fee rate and the brokerage fee rules for buy and sell orders.
+Returns the current fee configuration, including the global platform fee rate and the commission config for buy and sell orders.
 
 **Returns**
 
-| Parameter        | Type               | Required | Scale | Description                                                                 |
-|------------------|--------------------|----------|-------|-----------------------------------------------------------------------------|
-| platformFeeRate  | uint32             | Y        | 8     | Global platform fee rate, calculated based on the trade amount      |
-| buyFeeRules      | IMarket.FeeRule[]  | Y        |       | Brokerage fee rules applied to buy orders                                   |
-| sellFeeRules     | IMarket.FeeRule[]  | Y        |       | Brokerage fee rules applied to sell orders                                  |
+| Parameter            | Type                     | Required | Scale  | Description                                          |
+| -------------------- | ------------------------ | -------- | ------ | ---------------------------------------------------- |
+| globalFeeRate        | uint32                   | Y        | 6      | Global platform fee rate applied to the trade amount |
+| buyCommissionConfig  | IMarket.CommissionConfig | Y        |        | Commission config applied to buy orders              |
+| sellCommissionConfig | IMarket.CommissionConfig | Y        |        | Commission config applied to sell orders             |
 
-**IMarket.FeeRule**
+**IMarket.CommissionConfig**
 
-| Parameter | Type   | Required | Scale | Description                                                                 |
-|-----------|--------|----------|-------|-----------------------------------------------------------------------------|
-| ruleId    | uint8  | Y        |       | Identifier of the brokerage fee item                                        |
-| mode      | uint8  | Y        |       | Base fee calculation mode. Determines the meaning and precision of `value`; must not be `NONE`. See `IMarket.FeeMode` below |
-| minMode   | uint8  | Y        |       | Calculation mode for the minimum fee bound. `NONE` means no minimum limit and determines the meaning and precision of `minValue` |
-| maxMode   | uint8  | Y        |       | Calculation mode for the maximum fee bound. `NONE` means no maximum limit and determines the meaning and precision of `maxValue` |
-| value     | uint32 | Y        |       | Base fee value. Its unit and scale are determined by `mode`: `FIXED_FEE` = fixed amount scaled by `1e6`; `AMOUNT_RATIO` = amount-based rate scaled by `1e8`; `PER_SHARE` = per-share rate scaled by `1e8` |
-| minValue  | uint32 | Y        |       | Minimum fee bound value. Its unit and scale are determined by `minMode` |
-| maxValue  | uint32 | Y        |       | Maximum fee bound value. Its unit and scale are determined by `maxMode` |
+| Parameter | Type   | Required | Scale | Description                                 |
+| --------- | ------ | -------- | ----- | ------------------------------------------- |
+| min       | uint32 | Y        | 6     | Minimum commission amount                   |
+| rate      | uint32 | Y        | 6     | Commission rate applied to the trade amount |
 
-**IMarket.FeeMode**
-
-| Value | Name         | Description                                        |
-|-------|--------------|----------------------------------------------------|
-| 0     | NONE         | No fee mode. Used only for `minMode` and `maxMode` to indicate no minimum/maximum limit |
-| 1     | FIXED_FEE    | Fixed fee amount, scaled by `1e6`                  |
-| 2     | AMOUNT_RATIO | Amount-based fee rate, scaled by `1e8`             |
-| 3     | PER_SHARE    | Per-share fee rate, scaled by `1e8`                |
+Note: `min`, `tradeAmount`, and `rate` all use 6 decimal places. The final commission is calculated as `max(min, tradeAmount * rate / 1e6)`.
 
 **Example:**
 
@@ -343,42 +329,17 @@ Returns the current fee configuration, including the global platform fee rate an
 IMarket.getFeeConfig();
 // Returns
 {
-    "platformFeeRate": 400000,   // 0.004
-    "buyFeeRules": [
-        {
-            "ruleId": 1,
-            "mode": 3,             // FeeMode.PER_SHARE (value scaled by 1e8)
-            "minMode": 1,          // FeeMode.FIXED_FEE (minValue scaled by 1e6)
-            "maxMode": 2,          // FeeMode.AMOUNT_RATIO (maxValue scaled by 1e8)
-            "value": 350000,       // Base fee: 0.0035 per share
-            "minValue": 350000,    // Minimum fee: 0.35
-            "maxValue": 1000000    // Maximum fee: 1% of trade amount
-        }
-    ],
-    "sellFeeRules": [
-        {
-            "ruleId": 1,           // Same rule as buyFeeRules ruleId 1
-            "mode": 3,
-            "minMode": 1,
-            "maxMode": 2,
-            "value": 350000,
-            "minValue": 350000,
-            "maxValue": 1000000
-        }, 
-        {
-          "ruleId": 2,
-          "mode": 3,               // FeeMode.PER_SHARE (value scaled by 1e8)
-          "minMode": 1,            // FeeMode.FIXED_FEE (minValue scaled by 1e6)
-          "maxMode": 1,            // FeeMode.FIXED_FEE (maxValue scaled by 1e6)
-          "value": 19500,          // Base fee: 0.000195 per share
-          "minValue": 10000,       // Minimum fee: 0.01
-          "maxValue": 9790000      // Maximum fee: 9.79
-        }
-    ]
+    "globalFeeRate": 400,            // 0.0004
+    "buyCommissionConfig": {
+        "min": 200,                  // 0.0002
+        "rate": 40000                // 0.04
+    },
+    "sellCommissionConfig": {
+        "min": 100,                  // 0.0001
+        "rate": 35000                // 0.035
+    }
 }
 ```
-
-Note: The same `ruleId` represents the same brokerage fee rule definition. If a rule applies to both buy and sell orders, it may appear in both `buyFeeRules` and `sellFeeRules` with the same `ruleId`.
 
 ## 2.3 IRiskControl
 
@@ -388,7 +349,7 @@ Note: The same `ruleId` represents the same brokerage fee rule definition. If a 
 
 `IRiskControl.getPermissions(address account) external returns(uint)`
 
-For return values, refer to [Actions](#32-actions).
+For return values, see [Actions](#32-actions).
 
 **Example:**
 

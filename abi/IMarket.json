@@ -72,92 +72,42 @@
       "outputs": [
         {
           "internalType": "uint32",
-          "name": "platformFeeRate",
+          "name": "globalFeeRate",
           "type": "uint32"
         },
         {
           "components": [
             {
-              "internalType": "uint8",
-              "name": "ruleId",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "mode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "minMode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "maxMode",
-              "type": "uint8"
-            },
-            {
               "internalType": "uint32",
-              "name": "value",
+              "name": "min",
               "type": "uint32"
             },
             {
               "internalType": "uint32",
-              "name": "minValue",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "maxValue",
+              "name": "rate",
               "type": "uint32"
             }
           ],
-          "internalType": "struct IMarket.FeeRule[]",
-          "name": "buyFeeRules",
-          "type": "tuple[]"
+          "internalType": "struct IMarket.CommissionConfig",
+          "name": "buyCommissionConfig",
+          "type": "tuple"
         },
         {
           "components": [
             {
-              "internalType": "uint8",
-              "name": "ruleId",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "mode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "minMode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "maxMode",
-              "type": "uint8"
-            },
-            {
               "internalType": "uint32",
-              "name": "value",
+              "name": "min",
               "type": "uint32"
             },
             {
               "internalType": "uint32",
-              "name": "minValue",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "maxValue",
+              "name": "rate",
               "type": "uint32"
             }
           ],
-          "internalType": "struct IMarket.FeeRule[]",
-          "name": "sellFeeRules",
-          "type": "tuple[]"
+          "internalType": "struct IMarket.CommissionConfig",
+          "name": "sellCommissionConfig",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -264,12 +214,12 @@
       "outputs": [
         {
           "internalType": "address",
-          "name": "provider",
+          "name": "verifier",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "lib",
+          "name": "parser",
           "type": "address"
         }
       ],
@@ -348,92 +298,42 @@
       "inputs": [
         {
           "internalType": "uint32",
-          "name": "platformFeeRate",
+          "name": "globalFeeRate",
           "type": "uint32"
         },
         {
           "components": [
             {
-              "internalType": "uint8",
-              "name": "ruleId",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "mode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "minMode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "maxMode",
-              "type": "uint8"
-            },
-            {
               "internalType": "uint32",
-              "name": "value",
+              "name": "min",
               "type": "uint32"
             },
             {
               "internalType": "uint32",
-              "name": "minValue",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "maxValue",
+              "name": "rate",
               "type": "uint32"
             }
           ],
-          "internalType": "struct IMarket.FeeRule[]",
-          "name": "buyFeeRules",
-          "type": "tuple[]"
+          "internalType": "struct IMarket.CommissionConfig",
+          "name": "buyCommissionConfig",
+          "type": "tuple"
         },
         {
           "components": [
             {
-              "internalType": "uint8",
-              "name": "ruleId",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "mode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "minMode",
-              "type": "uint8"
-            },
-            {
-              "internalType": "enum IMarket.FeeMode",
-              "name": "maxMode",
-              "type": "uint8"
-            },
-            {
               "internalType": "uint32",
-              "name": "value",
+              "name": "min",
               "type": "uint32"
             },
             {
               "internalType": "uint32",
-              "name": "minValue",
-              "type": "uint32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "maxValue",
+              "name": "rate",
               "type": "uint32"
             }
           ],
-          "internalType": "struct IMarket.FeeRule[]",
-          "name": "sellFeeRules",
-          "type": "tuple[]"
+          "internalType": "struct IMarket.CommissionConfig",
+          "name": "sellCommissionConfig",
+          "type": "tuple"
         }
       ],
       "name": "updateFeeConfig",
@@ -538,12 +438,12 @@
         },
         {
           "internalType": "address",
-          "name": "newProvider",
+          "name": "newVerifier",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "newLib",
+          "name": "newParser",
           "type": "address"
         }
       ],
@@ -614,7 +514,7 @@
         },
         {
           "internalType": "uint32",
-          "name": "feeRate",
+          "name": "newFeeRate",
           "type": "uint32"
         }
       ],
